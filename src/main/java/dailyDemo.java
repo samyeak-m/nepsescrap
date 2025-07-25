@@ -23,12 +23,12 @@ import java.util.Map;
 
 public class dailyDemo {
 
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/nepse_test";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/nepse?createDatabaseIfNotExist=true";
     private static final String DB_USER = "root";
     private static final String DB_PASS = "";
     private static final long INTERVAL = 60000;
-    private static final LocalTime START_OF_DAY = LocalTime.of(1, 05);
-    private static final LocalTime END_OF_DAY = LocalTime.of(1, 15);
+    private static final LocalTime START_OF_DAY = LocalTime.of(14, 05);
+    private static final LocalTime END_OF_DAY = LocalTime.of(14, 15);
 
     private static String lastHash = "";
 
@@ -47,11 +47,11 @@ public class dailyDemo {
                 LocalDate today = LocalDate.now();
                 DayOfWeek dayOfWeek = today.getDayOfWeek();
 
-                if (dayOfWeek == DayOfWeek.FRIDAY || dayOfWeek == DayOfWeek.SATURDAY) {
-                    System.out.println("Market is closed on Friday and Saturday. Sleeping until Sunday.");
-                    Thread.sleep(getSleepDurationUntilSunday());
-                    continue;
-                }
+//                if (dayOfWeek == DayOfWeek.FRIDAY || dayOfWeek == DayOfWeek.SATURDAY) {
+//                    System.out.println("Market is closed on Friday and Saturday. Sleeping until Sunday.");
+//                    Thread.sleep(getSleepDurationUntilSunday());
+//                    continue;
+//                }
 
                 if (now.isBefore(START_OF_DAY) || now.isAfter(END_OF_DAY)) {
                     if (now.isAfter(END_OF_DAY)) {
@@ -382,7 +382,6 @@ Map<String, Integer> updateCounts = new HashMap<>();  // Initialize map to store
                     }
 
                     String tableName = "daily_data_" + symbol.replaceAll("\\W", "_").toLowerCase();  // Normalize to lowercase
-// Normalize to lowercase
 
                     if (!dailyData.tableExists(conn, tableName)) {
                         String createTableSql = "CREATE TABLE " + tableName + " (" +

@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Locale;
 
 public class etd {
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/nepse_test";
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/nepse?createDatabaseIfNotExist=true";
     private static final String USERNAME = "root";
     private static final String PASSWORD = "";
-    private static final String FOLDER_PATH = "D:/downloads/scrap/2024";
+    private static final String FOLDER_PATH = "/Users/Mac//Desktop/mandalasystem/untitled/data/excel/1st";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
 
     public static void main(String[] args) {
@@ -33,10 +33,8 @@ public class etd {
                         processExcelFile(path, stockDataList);
                     });
 
-            // Delete existing data before inserting new data
             deleteExistingData(connection);
 
-            // Insert new data
             insertStockData(connection, stockDataList);
             System.out.println("Data insertion complete.");
         } catch (IOException | SQLException e) {
@@ -106,7 +104,7 @@ public class etd {
     }
 
     private static StockData parseStockData(Row row) throws DateTimeParseException, NumberFormatException {
-        String dateStr = getCellValue(row.getCell(19));
+        String dateStr = getCellValue(row.getCell(22));
         LocalDate date = LocalDate.parse(dateStr, DATE_FORMATTER);
         String symbol = getCellValue(row.getCell(1));
         double open = Double.parseDouble(getCellValue(row.getCell(3)));
