@@ -1,9 +1,13 @@
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-import java.io.*;
-import java.nio.file.*;
-import java.sql.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -12,8 +16,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 public class etd {
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/nepse?createDatabaseIfNotExist=true";
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/porfoliomanagment_nepse?createDatabaseIfNotExist=true";
     private static final String USERNAME = "root";
     private static final String PASSWORD = "";
     private static final String FOLDER_PATH = "/Users/Mac//Desktop/mandalasystem/untitled/data/excel/1st";
@@ -54,9 +65,7 @@ public class etd {
                 Row row = rowIterator.next();
                 try {
                     StockData stockData = parseStockData(row);
-                    if (stockData.close >= 100) {
-                        stockDataList.add(stockData);
-                    }
+                    stockDataList.add(stockData);  // Remove the if condition
                 } catch (DateTimeParseException | NumberFormatException e) {
                     System.err.println("Error parsing row: " + row.getRowNum() + " - " + e.getMessage());
                 }
@@ -105,7 +114,15 @@ public class etd {
 
     private static StockData parseStockData(Row row) throws DateTimeParseException, NumberFormatException {
         String dateStr = getCellValue(row.getCell(22));
-        LocalDate date = LocalDate.parse(dateStr, DATE_FORMATTER);
+        LocalDate date;
+
+        try {
+            date = LocalDate.parse(dateStr, DATE_FORMATTER);
+        } catch (Exception e) {
+            dateStr = getCellValue(row.getCell(24));
+            date = LocalDate.parse(dateStr, DATE_FORMATTER);
+        }
+
         String symbol = getCellValue(row.getCell(1));
         double open = Double.parseDouble(getCellValue(row.getCell(3)));
         double high = Double.parseDouble(getCellValue(row.getCell(4)));
